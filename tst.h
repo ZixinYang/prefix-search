@@ -55,6 +55,8 @@ void *tst_search_prefix(const tst_node *root,
  *
  * Then, invoke as "tst_traverse_fn (root, print_word, NULL);"
  */
+void print_word(const void *node, void *data);
+
 void tst_traverse_fn(const tst_node *p,
                      void(fn)(const void *, void *),
                      void *data);

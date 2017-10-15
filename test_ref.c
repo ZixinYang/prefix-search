@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <bench.h>
 #include "tst.h"
 
 /** constants insert, delete, max word(s) & stack nodes */
@@ -50,9 +50,10 @@ int main(int argc, char **argv)
 
     t1 = tvgetf();
     while ((rtn = fscanf(fp, "%s", word)) != EOF) {
-        char *p = word;
+        if ( word[strlen(word)-1]== ',') word[strlen(word)-1] = '\0';
+        char *p = strdup(word);
         /* FIXME: insert reference to each string */
-        if (!tst_ins_del(&root, &p, INS, CPY)) {
+        if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
@@ -63,6 +64,12 @@ int main(int argc, char **argv)
 
     fclose(fp);
     printf("ternary_tree, loaded %d words in %.6f sec\n", idx, t2 - t1);
+
+    if (argc == 2 && strcmp(argv[1], "--bench") == 0) {
+        int stat = bench_test(root, BENCH_TEST_FILE, LMAX);
+        tst_free(root);
+        return stat;
+    }
 
     for (;;) {
         printf(
@@ -84,10 +91,11 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = word;
+            p = strdup(word);
             t1 = tvgetf();
             /* FIXME: insert reference to each string */
-            res = tst_ins_del(&root, &p, INS, CPY);
+
+            res = tst_ins_del(&root, &p, INS, REF);
             t2 = tvgetf();
             if (res) {
                 idx++;
@@ -135,11 +143,11 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = word;
+            p = strdup(word);
             printf("  deleting %s\n", word);
             t1 = tvgetf();
             /* FIXME: remove reference to each string */
-            res = tst_ins_del(&root, &p, DEL, CPY);
+            res = tst_ins_del(&root, &p, DEL, REF);
             t2 = tvgetf();
             if (res)
                 printf("  delete failed.\n");
@@ -149,7 +157,7 @@ int main(int argc, char **argv)
             }
             break;
         case 'q':
-            tst_free_all(root);
+            tst_free(root);
             return 0;
             break;
         default:

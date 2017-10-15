@@ -386,6 +386,12 @@ void *tst_search_prefix(const tst_node *root,
  *  prototype for 'fn' is void fn(const void *, void *). data can
  *  be NULL if unused.
  */
+
+void print_word(const void *node, void *data)
+{
+    printf("%s\n", tst_get_string(node));
+}
+
 void tst_traverse_fn(const tst_node *p,
                      void(fn)(const void *, void *),
                      void *data)
